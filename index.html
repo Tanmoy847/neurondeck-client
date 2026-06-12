@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuronDeck | Think in Chains</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Space Grotesk', 'sans-serif'] },
+                extend: {
+                    colors: {
+                        zinc: { 950: '#030305', 900: '#101012', 800: '#1a1a1e' },
+                        brand: { cyan: '#00f0ff', red: '#ff003c' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="antialiased selection:bg-brand-cyan selection:text-black min-h-screen flex flex-col">
+
+    <nav class="fixed top-0 w-full z-50 bg-zinc-950/80 backdrop-blur-md border-b border-white/5 h-20">
+        <div class="px-6 h-full flex items-center justify-between max-w-7xl mx-auto">
+            
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.returnToTerminal()">
+                    <i class="ph-bold ph-brain text-white"></i>
+                <span class="text-xl font-bold font-display tracking-tight text-white group">
+                    Neuron<span class="text-brand-cyan group-hover:text-white transition-colors">Deck</span>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="hidden sm:flex items-center gap-2 text-zinc-500 font-mono text-xs">
+                    <div class="w-2 h-2 bg-brand-cyan rounded-full animate-pulse"></div>
+                    Engine Online
+                </div>
+                
+                <button onclick="NeuronDeck.Profile.toggle()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 hover:border-brand-cyan transition-colors overflow-hidden flex items-center justify-center cursor-pointer shadow-lg group">
+                    <img id="nav-profile-img" src="https://placehold.co/100" class="w-full h-full object-cover hidden">
+                    <i id="nav-profile-icon" class="ph-bold ph-user text-zinc-400 group-hover:text-brand-cyan transition-colors text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content" class="pt-28 pb-20 px-4 md:px-10 flex-grow flex flex-col items-center w-full">
+        
+        <div id="view-home" class="w-full max-w-3xl animate-in fade-in slide-in-from-bottom-4 duration-500 mt-10 md:mt-20">
+            
+            <div class="text-center mb-10">
+                <h1 class="text-4xl md:text-6xl font-display font-bold text-white tracking-tight mb-4">
+                    Learn in cards. <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Think in chains.</span>
+                </h1>
+                <p class="text-zinc-400 font-mono text-sm tracking-widest uppercase">Initialize Knowledge Sequence</p>
+            </div>
+
+            <div class="relative group">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand-cyan to-blue-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                <div class="relative flex items-center bg-zinc-950 border border-white/10 rounded-2xl p-2 shadow-2xl focus-within:border-brand-cyan transition-colors">
+                    <i class="ph-bold ph-magnifying-glass text-2xl text-zinc-500 ml-4"></i>
+                    <input type="text" id="main-deck-search" placeholder="Enter a topic to generate cards..." 
+                        class="w-full bg-transparent border-none text-white text-lg px-4 py-4 focus:outline-none placeholder-zinc-600 font-medium autocomplete="off">
+                    <button id="btn-generate" class="px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-brand-cyan transition-colors duration-300 flex items-center gap-2">
+                        <span>Generate</span>
+                        <i class="ph-bold ph-lightning"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-20">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Recents</h3>
+                    <button class="text-[10px] text-brand-cyan hover:underline uppercase tracking-wide">Clear History</button>
+                </div>
+                <div id="recent-chains-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+            </div>
+        </div>
+
+        <div id="view-learning" class="w-full max-w-3xl hidden animate-in fade-in duration-500 mt-4">
+            <button onclick="window.returnToTerminal()" class="mb-8 text-zinc-500 hover:text-white transition flex items-center gap-2 text-sm font-bold group">
+                <i class="ph-bold ph-arrow-left group-hover:-translate-x-1 transition-transform"></i> Back to Terminal
+            </button>
+            <h2 id="page-title" class="text-3xl font-display font-bold mb-8 text-white"></h2>
+            
+            <div id="card-chain-container" class="space-y-4 pb-20">
+                </div>
+        </div>
+
+    </main>
+
+    <div id="auth-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div class="bg-zinc-950 border border-white/10 w-full max-w-md rounded-3xl p-8 shadow-2xl relative">
+            <button onclick="NeuronDeck.Profile.toggle()" class="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-xl"></i></button>
+            
+            <div id="login-view">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 id="auth-title" class="text-2xl font-display font-bold text-white mb-1">Access Terminal</h2>
+                        <p id="auth-subtitle" class="text-zinc-500 text-sm">Authenticate to sync your neural chains.</p>
+                    </div>
+                    <button onclick="NeuronDeck.Profile.toggleAuthMode()" id="auth-toggle-btn" class="text-brand-cyan text-xs hover:underline uppercase tracking-widest font-mono cursor-pointer">Create Account</button>
+                </div>
+
+                <div id="email-auth-msg" class="hidden mb-4 text-sm px-4 py-3 rounded-xl border font-mono"></div>
+
+                <div class="space-y-4">
+                    <input type="text" id="auth-username" placeholder="Username (New accounts only)" class="hidden w-full bg-zinc-900 border border-white/10 rounded-xl p-4 text-white focus:border-brand-cyan focus:outline-none transition-colors placeholder-zinc-600 font-mono text-sm">
+                    <input type="email" id="auth-email" placeholder="Email Address" class="w-full bg-zinc-900 border border-white/10 rounded-xl p-4 text-white focus:border-brand-cyan focus:outline-none transition-colors placeholder-zinc-600 font-mono text-sm">
+                    <input type="password" id="auth-password" placeholder="Password" class="w-full bg-zinc-900 border border-white/10 rounded-xl p-4 text-white focus:border-brand-cyan focus:outline-none transition-colors placeholder-zinc-600 font-mono text-sm">
+                    
+                    <button onclick="NeuronDeck.Profile.submitEmailAuth()" id="auth-submit-btn" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-brand-cyan transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)]">Initialize Session</button>
+                    
+                    <div class="flex items-center gap-4 py-2">
+                        <div class="flex-1 h-px bg-white/10"></div>
+                        <span class="text-zinc-600 text-[10px] font-mono uppercase tracking-widest">Or Connect Via</span>
+                        <div class="flex-1 h-px bg-white/10"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="NeuronDeck.Profile.loginWithGoogle()" class="w-full bg-zinc-900 border border-white/10 text-white font-bold py-3 rounded-xl hover:border-brand-cyan transition-colors flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-google-logo text-xl"></i> Google
+                        </button>
+                        <button onclick="NeuronDeck.Profile.loginWithGithub()" class="w-full bg-zinc-900 border border-white/10 text-white font-bold py-3 rounded-xl hover:border-brand-cyan transition-colors flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-github-logo text-xl"></i> GitHub
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile-view" class="hidden text-center pt-4">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full border-2 border-brand-cyan overflow-hidden shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <img id="modal-profile-img" src="https://placehold.co/150" class="w-full h-full object-cover">
+                </div>
+                <h2 id="modal-username" class="text-2xl font-display font-bold text-white mb-1">User</h2>
+                <p class="text-brand-cyan text-xs font-mono uppercase tracking-widest mb-8">Authorized</p>
+                <button onclick="NeuronDeck.Profile.logout()" class="w-full bg-zinc-900 border border-brand-red/30 text-brand-red font-bold py-3 rounded-xl hover:bg-brand-red hover:text-black transition-colors">Terminate Session</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
