@@ -2,7 +2,7 @@
 // NEURONDECK CORE ENGINE (CLOUD AUTH & VERSIONING)
 // ==========================================
 
-const supabaseUrl = 'https://fkfksnmplvadvnwkozja.supabase.co/rest/v1/';
+const supabaseUrl = 'https://fkfksnmplvadvnwkozja.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrZmtzbm1wbHZhZHZud2tvemphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDQxNjcsImV4cCI6MjA5NTcyMDE2N30.R_D5PV_DjfP7tmIDxohfFRvNprQj6oKBtp4E48uL9tE';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
